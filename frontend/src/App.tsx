@@ -95,14 +95,7 @@ function App() {
             </RootLayout>
           }
         />
-<Route
-  path="/templates"
-  element={
-    <RootLayout>
-      <TemplatesComponent />
-    </RootLayout>
-  }
-/>
+
 <Route
   path="/writing-assistant"
   element={
