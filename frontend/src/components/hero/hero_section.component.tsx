@@ -42,6 +42,11 @@ const HeroSectionComponent = () => {
                     Started
                   </button>
                 </Link>
+                <Link to="/collab">
+                  <button className="relative !rounded-button bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium px-6 py-2 border border-white/20 transition-all duration-300 rounded-xl cursor-pointer">
+                    ✍️ Collab Mode
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
