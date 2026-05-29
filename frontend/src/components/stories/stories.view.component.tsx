@@ -428,6 +428,39 @@ const StoriesViewComponent: React.FC<StoriesComponentProps> = ({
     }
   };
 
+  const handleShareStory = async (platform: string) => {
+    if (!selectedStory) return;
+    
+    const title = encodeURIComponent(selectedStory.title || "Check out this story");
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(`Check out this amazing story: ${selectedStory.title}`);
+    
+    let shareUrl = "";
+    
+    switch (platform) {
+      case "twitter":
+        shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+        break;
+      case "facebook":
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        break;
+      case "linkedin":
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+        break;
+      case "whatsapp":
+        shareUrl = `https://wa.me/?text=${text} ${url}`;
+        break;
+      case "copy":
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Link copied to clipboard!");
+        return;
+      default:
+        return;
+    }
+    
+    window.open(shareUrl, "_blank", "width=600,height=400");
+  };
+
   const handleExportPDF = async () => {
     if (!selectedStory) { toast.error("No story available to export."); return; }
     const toastId = toast.loading("Preparing your premium PDF...");
@@ -656,6 +689,9 @@ const StoriesViewComponent: React.FC<StoriesComponentProps> = ({
                 </button>
                 <button type="button" className="rounded-lg px-4 py-2 bg-indigo-700 text-slate-200 font-semibold cursor-pointer hover:bg-indigo-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" onClick={handleExportMarkdown} disabled={!selectedStory}>
                   ⬇️ Export Markdown
+                </button>
+                <button type="button" className="rounded-lg px-4 py-2 bg-pink-600 text-slate-200 font-semibold cursor-pointer hover:bg-pink-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" onClick={() => handleShareStory("twitter")} disabled={!selectedStory}>
+                  🐦 Share
                 </button>
                 <button type="button" className="rounded-lg px-4 py-2 bg-violet-700 text-slate-200 font-semibold cursor-pointer hover:bg-violet-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" onClick={() => setShowWorldMap(true)} disabled={!selectedStory}>
                   🗺️ World Map
