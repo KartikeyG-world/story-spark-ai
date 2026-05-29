@@ -8,7 +8,7 @@ import { Post } from "../post/post.model";
 
 const toggleReaction = async (
   postId: string,
-  type: string = "like",
+  type: "like" | "love" | "laugh" | "angry" | "sad" = "like",
   token: ITokenPayload
 ) => {
   const { email } = token;
@@ -30,12 +30,14 @@ const toggleReaction = async (
     if (existingReaction.type === type) {
       // Remove reaction if clicking the same one
       await Reaction.deleteOne({ _id: existingReaction._id });
-      return { message: "Reaction removed", type: null };
+      const likesCount = await Reaction.countDocuments({ postId: new Types.ObjectId(postId) });
+      return { message: "Reaction removed", type: null, likesCount };
     } else {
       // Update reaction type
       existingReaction.type = type;
       await existingReaction.save();
-      return { message: "Reaction updated", type };
+      const likesCount = await Reaction.countDocuments({ postId: new Types.ObjectId(postId) });
+      return { message: "Reaction updated", type, likesCount };
     }
   } else {
     const newReaction = await Reaction.create({
@@ -43,7 +45,8 @@ const toggleReaction = async (
       userId: user._id,
       type: type,
     });
-    return { message: "Reaction added", type: newReaction.type };
+    const likesCount = await Reaction.countDocuments({ postId: new Types.ObjectId(postId) });
+    return { message: "Reaction added", type: newReaction.type, likesCount };
   }
 };
 
