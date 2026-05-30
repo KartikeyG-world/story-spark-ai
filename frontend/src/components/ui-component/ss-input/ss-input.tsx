@@ -18,6 +18,7 @@ interface SSInputProps<T extends FieldValues> {
   validation?: RegisterOptions<T>;
   error?: FieldError;
   autoComplete?: string;
+  autoFocus?: boolean;
 }
 
 const SSInput = <T extends FieldValues>({
@@ -30,6 +31,7 @@ const SSInput = <T extends FieldValues>({
   validation,
   error,
   autoComplete,
+  autoFocus
 }: SSInputProps<T>) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -53,6 +55,7 @@ const inputType =
         <input
           type={inputType}
           id={name}
+           autoFocus={autoFocus}
           className={`w-full pl-8 pr-10 py-1.5 ttext-base text-gray-900 dark:text-gray-200 bg-white dark:bg-slate-800 border rounded-md sm:text-sm ${
           error
           ? "border-red-500 outline-red-500"
