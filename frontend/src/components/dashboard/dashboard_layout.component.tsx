@@ -192,7 +192,7 @@ const DashboardLayout: React.FC = () => {
   if (!user) {
   return <Navigate to="/login" replace />;
 }
-
+const { data } = useGetProfileInfoQuery();
   const currentPage = menuItems
     .flatMap((item) => (item.subRoutes ? [item, ...item.subRoutes] : [item]))
     .find(
@@ -246,11 +246,16 @@ const DashboardLayout: React.FC = () => {
             </span>
           </button>
 
-          <img
-            className="h-9 w-9 rounded-full object-cover border border-slate-200 dark:border-white/10"
-            src={userProfile?.profile?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "User")}&background=random`}
-            alt="profile"
-          />
+<img
+  className="h-9 w-9 rounded-full object-cover border border-slate-200 dark:border-white/10"
+  src={
+    userProfile?.profile?.avatar ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      user?.name || "User"
+    )}&background=random`
+  }
+  alt="profile"
+/>
         </div>
       </header>
 
