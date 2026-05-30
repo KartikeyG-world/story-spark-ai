@@ -149,6 +149,66 @@ const getPosts = async (
   };
 };
 
+const getPublishedPostsByAuthor = async (
+  token: ITokenPayload,
+  filters: Pick<IPostSearchFields, "searchTerm">,
+  pagination: IPaginationOptions
+): Promise<IGenericResponse<IPost[]>> => {
+  const { page, limit, skip, sortBy, orderBy } = paginationHelper(pagination);
+  const user = await User.findOne({ email: token.email, role: token.role });
+
+  if (!user) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "User not found!");
+  }
+
+  const andCondition: Record<string, unknown>[] = [
+    { author: user._id },
+    { isPublished: true },
+    { isDeleted: { $ne: true } },
+  ];
+
+  if (filters.searchTerm) {
+    andCondition.push({
+      $or: postSearchFields.map((field) => ({
+        [field]: {
+          $regex: filters.searchTerm,
+          $options: "i",
+        },
+      })),
+    });
+  }
+
+  const sortCondition: { [key: string]: SortOrder } = {};
+  if (sortBy && orderBy) {
+    sortCondition[sortBy] = orderBy === "asc" ? 1 : -1;
+  } else {
+    sortCondition.publishedAt = -1;
+    sortCondition.createdAt = -1;
+  }
+
+  const whereCondition = { $and: andCondition };
+  const result = await Post.find(whereCondition)
+    .sort(sortCondition)
+    .skip(skip)
+    .limit(limit)
+    .populate("author", "name email createdAt")
+    .populate({
+      path: "reactions",
+      populate: { path: "userId", select: "email" },
+    })
+    .populate("bookmarks", "email");
+  const total = await Post.countDocuments(whereCondition);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
 const getLatestPosts = async () => {
   try {
     const res = await Post.find({ isDeleted: { $ne: true } })
@@ -350,6 +410,7 @@ const deletePost = async (postId: string, token: ITokenPayload) => {
 export const PostService = {
   createPost,
   getPosts,
+  getPublishedPostsByAuthor,
   getLatestPosts,
   getFeaturedPosts,
   doFeaturedPosts,
@@ -359,4 +420,3 @@ export const PostService = {
   updatePost,
   deletePost,
 };
-

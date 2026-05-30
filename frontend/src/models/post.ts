@@ -44,6 +44,7 @@ export interface Post {
   topic: Topic[];
   language?: string;
   emotions?: string[];
+  genre?: string;
   author: Author;
   likesCount: number;
   commentsCount: number;
