@@ -41,7 +41,7 @@ const aiFreeModelGenerate = catchAsync(async (req: Request, res: Response) => {
 
   if (!userId) {
     userId = Math.random().toString(36).substring(7);
-    setGuestUserIdCookie(res, userId);  // ✅ Fixed: now includes sameSite
+    setGuestUserIdCookie(res, userId);
   }
 
   const guard = createGuestQuotaGuard(userId);
@@ -86,7 +86,7 @@ const aiFreeModelAlternateEndings = catchAsync(
 
     if (!userId) {
       userId = Math.random().toString(36).substring(7);
-      setGuestUserIdCookie(res, userId);  // ✅ Fixed: now includes sameSite
+      setGuestUserIdCookie(res, userId);
     }
 
     const guard = createGuestQuotaGuard(userId);
@@ -163,7 +163,7 @@ const aiFreeModelRemix = catchAsync(async (req: Request, res: Response) => {
 
   if (!userId) {
     userId = Math.random().toString(36).substring(7);
-    res.cookie("userId", userId, { maxAge: 30 * 24 * 60 * 60 * 1000 });
+    setGuestUserIdCookie(res, userId);
   }
 
   const guard = createGuestQuotaGuard(userId);
@@ -207,7 +207,7 @@ const aiFreeModelTranslate = catchAsync(async (req: Request, res: Response) => {
 
   if (!userId) {
     userId = Math.random().toString(36).substring(7);
-    res.cookie("userId", userId, { maxAge: 30 * 24 * 60 * 60 * 1000 });
+    setGuestUserIdCookie(res, userId);
   }
 
   const guard = createGuestQuotaGuard(userId);
@@ -251,7 +251,7 @@ const aiFreeModelChat = catchAsync(async (req: Request, res: Response) => {
 
   if (!userId) {
     userId = Math.random().toString(36).substring(7);
-    res.cookie("userId", userId, { maxAge: 30 * 24 * 60 * 60 * 1000 });
+    setGuestUserIdCookie(res, userId);
   }
 
   const guard = createGuestQuotaGuard(userId);
