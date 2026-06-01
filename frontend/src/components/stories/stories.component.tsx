@@ -734,7 +734,7 @@ useEffect(() => {
 
   const isOverLimit = textareaValue.length >= MAX_PROMPT_LENGTH;
   const isNearLimit = textareaValue.length >= MAX_PROMPT_LENGTH * WARN_THRESHOLD;
-  const isGenerateDisabled = loading || isOverLimit;
+  const isGenerateDisabled = loading || isOverLimit || !textareaValue.trim();
 
   useKeyboardShortcuts({
     onOpenHelp: () => setShowHelpModal(true),
