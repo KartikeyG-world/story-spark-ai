@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+﻿import React, { useState, useEffect, useRef, useMemo } from "react";
 import StoriesViewComponent, { IStories } from "./stories.view.component";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getUserInfo, isLoggedIn } from "../../services/auth.service";
@@ -184,6 +184,8 @@ const LANGUAGE_STORAGE_KEY = "storySparkLanguage";
 const soundtrackMap: Record<string, string> = {};
 
 const StoriesComponent = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+const storiesPerPage = 10;
   const location = useLocation();
   const navigate = useNavigate();
   const { register, handleSubmit, reset, setValue } = useForm<Inputs>();
@@ -211,7 +213,51 @@ const StoriesComponent = () => {
           },
         ]
   );
+  
   const [loading, setLoading] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchFilter, setSearchFilter] = useState<string>("all");
+
+  const uniqueStories = useMemo(() => getUniqueStories(stories), [stories]);
+
+  const filteredStories = useMemo(() => {
+    if (!searchQuery.trim()) return uniqueStories;
+    
+    const query = searchQuery.toLowerCase();
+    
+    return uniqueStories.filter((story) => {
+      switch (searchFilter) {
+        case "title":
+          return story.title?.toLowerCase().includes(query);
+        case "content":
+          return story.content?.toLowerCase().includes(query);
+        case "genre":
+          return story.tag?.toLowerCase().includes(query);
+        case "all":
+        default:
+          return (
+            story.title?.toLowerCase().includes(query) ||
+            story.content?.toLowerCase().includes(query) ||
+            story.tag?.toLowerCase().includes(query)
+          );
+      }
+    });
+  }, [uniqueStories, searchQuery, searchFilter]);
+  const indexOfLastStory = currentPage * storiesPerPage;
+const indexOfFirstStory = indexOfLastStory - storiesPerPage;
+
+const currentStories = filteredStories.slice(
+  indexOfFirstStory,
+  indexOfLastStory
+);
+
+const totalPages = Math.ceil(
+  filteredStories.length / storiesPerPage
+);
+useEffect(() => {
+  setCurrentPage(1);
+}, [searchQuery, searchFilter]);
+
   const { data } = useGetProfileInfoQuery(undefined);
   const userRole = getUserInfo();
   const login = isLoggedIn();
@@ -219,7 +265,11 @@ const StoriesComponent = () => {
   const [generateFreeModel] = useGenerateFreeModelMutation();
   const [selectedPrompt, setSelectedPrompt] = useState<string>("");
   const [showHelpModal, setShowHelpModal] = useState(false);
-  const [selectedGenre, setSelectedGenre] = useState<string>(draft?.genre || "");
+  const [selectedGenre, setSelectedGenre] = useState<string>(
+  draft?.genre
+    ? (GENRES.find((g) => g.name === draft.genre || g.value === draft.genre)?.value ?? "ðŸ§™ Fantasy")
+    : "ðŸ§™ Fantasy",
+);
   const [selectedLength, setSelectedLength] = useState<string>(draft?.length || "medium");
   const [textareaValue, setTextareaValue] = useState<string>(
     location.state?.prompt || draft?.prompt || ""
@@ -266,6 +316,8 @@ const StoriesComponent = () => {
   const [selectedTone, setSelectedTone] = useState<string>(draft?.tone || "");
   useEffect(() => {
     const timer = setTimeout(() => {
+      // stories intentionally excluded â€” API response, not user input
+      // including stories risks hitting localStorage quota (~5MB) silently
       const draftData = {
         prompt: textareaValue,
         genre: selectedGenre,
@@ -273,7 +325,13 @@ const StoriesComponent = () => {
         language: selectedLanguage,
         stories,
       };
-      localStorage.setItem("story_spark_draft", JSON.stringify(draftData));
+      try {
+        localStorage.setItem("story_spark_draft", JSON.stringify(draftData));
+      } catch (err) {
+        if (err instanceof DOMException && err.name === "QuotaExceededError") {
+          toast.error("Couldn't autosave draft â€” storage limit reached.");
+        }
+      }
     }, 1000);
     return () => clearTimeout(timer);
   }, [textareaValue, selectedGenre, selectedLength, selectedLanguage, selectedTone, stories]);
@@ -361,6 +419,14 @@ const StoriesComponent = () => {
     isGenerationInProgressRef.current = true;
     setLoading(true);
     try {
+      // 60-second client-side request timeout safeguard
+      timeoutId = setTimeout(() => {
+        if (isGenerationInProgressRef.current) {
+          toast.error("Story generation timed out. Please try again.");
+          handleCancelGeneration(true);
+        }
+      }, 60000);
+
       const payload = {
         prompt: selectedGenre
           ? `[Genre: ${selectedGenre}] ${formData.prompt}`
@@ -368,6 +434,7 @@ const StoriesComponent = () => {
         wordLength:
           selectedLength === "short" ? 150 : selectedLength === "long" ? 500 : 250,
         language: selectedLanguage,
+        tone: selectedTone || undefined,
       };
       const generationRequest = login
         ? generateModel(payload)
@@ -392,6 +459,9 @@ const StoriesComponent = () => {
       const message = getErrorMessage(error);
       if (message !== "Story generation was cancelled.") toast.error(message);
     } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
       activeGenerationRef.current = null;
       isGenerationInProgressRef.current = false;
       setLoading(false);
@@ -421,6 +491,9 @@ const StoriesComponent = () => {
     onOpenHelp: () => setShowHelpModal(true),
     onCloseHelp: () => setShowHelpModal(false),
     onGenerate: () => {
+      if (isGenerateDisabled) {
+        return;
+      }
       if (inputRef.current) {
         const form = inputRef.current.closest("form");
         if (form) form.requestSubmit();
@@ -540,7 +613,7 @@ const StoriesComponent = () => {
             >
               Amazing Stories!
             </span>{" "}
-            ✨
+            âœ¨
           </h1>
           <p style={{ color: "#4b5563", marginTop: "10px", fontSize: "14px" }}>
             Powered by AI — describe your idea, we&apos;ll craft the story.
@@ -689,7 +762,7 @@ const StoriesComponent = () => {
       {loading && <StoryGeneratingAnimation />}
 
       <StoriesViewComponent
-        stories={stories}
+        stories={currentStories}
         isLogin={login}
         setStories={setStories}
         onPublishSuccess={handlePublishSuccess}
@@ -730,6 +803,30 @@ const StoriesComponent = () => {
               Continue Browsing
             </button>
           </div>
+        </div>
+      )}
+     
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-6">
+          <button
+            onClick={() => setCurrentPage((p) => p - 1)}
+            disabled={currentPage === 1}
+            className="px-4 py-2 rounded bg-slate-700 text-white disabled:opacity-50"
+          >
+            Previous
+          </button>
+
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <button
+            onClick={() => setCurrentPage((p) => p + 1)}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 rounded bg-slate-700 text-white disabled:opacity-50"
+          >
+            Next
+          </button>
         </div>
       )}
 
