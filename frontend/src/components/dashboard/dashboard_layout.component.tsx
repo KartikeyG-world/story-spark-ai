@@ -1,4 +1,4 @@
-﻿// //
+// //
 // import React, { useState } from "react";
 // import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 // import { MenuItem, menuItems } from "./dashboard.utils";
@@ -176,7 +176,6 @@ import { Link, Outlet, useLocation, useNavigate, Navigate } from "react-router-d
 import { MenuItem, menuItems } from "./dashboard.utils";
 import { getUserInfo } from "../../services/auth.service";
 import { useGetProfileInfoQuery } from "../../redux/apis/user.api";
-import LoadingAnimation from "../loading/loading.component";
 const DashboardLayout: React.FC = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
@@ -194,7 +193,6 @@ const DashboardLayout: React.FC = () => {
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-  const { data } = useGetProfileInfoQuery();
   const currentPage = menuItems
     .flatMap((item) => (item.subRoutes ? [item, ...item.subRoutes] : [item]))
     .find(

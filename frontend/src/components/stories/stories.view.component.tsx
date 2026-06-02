@@ -85,6 +85,7 @@ interface StoriesComponentProps {
 }
 
 interface IRelatedStoriesComponentProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   posts: any[];
   currentPostId: string;
 }
@@ -198,6 +199,7 @@ const createDocxBlob = ({
   });
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const StoryRemixModal = StoryRemix as React.ComponentType<any>;
 
 const StoryWorldMapModal = StoryWorldMap as React.ComponentType<{
@@ -460,6 +462,7 @@ const StoriesViewComponent: React.FC<StoriesComponentProps> = ({
 
       setEndingsCache((prev) => ({ ...prev, [selectedStory.uuid]: res.data }));
       toast.success("Alternate endings generated successfully!");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("[StoriesView Alternate Ending Flow Failure]:", err);
       const errorStatus = err?.status || err?.data?.status;
