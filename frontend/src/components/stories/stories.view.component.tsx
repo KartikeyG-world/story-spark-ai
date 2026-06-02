@@ -198,7 +198,7 @@ const createDocxBlob = ({
   });
 };
 
-const StoryRemixModal = StoryRemix as React.ComponentType<{
+const StoryRemixModal = StoryRemix as unknown as React.ComponentType<{
   story?: string;
   title?: string;
   selectedStory?: IStories;
