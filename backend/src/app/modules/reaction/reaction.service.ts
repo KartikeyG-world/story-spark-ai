@@ -25,6 +25,7 @@ const toggleReaction = async (
     _id: postId,
     isDeleted: { $ne: true },
   }).select("likesCount reactions");
+  
 
   if (!post) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Post not found!");
