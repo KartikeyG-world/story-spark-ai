@@ -18,8 +18,6 @@ import BookmarkButton from "../BookmarkButton";
 import logo from "../../assets/logoNew.png";
 import StoryGeneratingAnimation from "../loading/story-generating-animation.component";
 import AudioPlayer, { type AudioPlayerHandle, type NarrationPlaybackState } from "../AudioPlayer";
-import ReaderPreferencesPanel from "../reader-preferences/ReaderPreferences";
-import { useReaderPreferences } from "../reader-preferences/useReaderPreferences";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import {
@@ -221,7 +219,6 @@ const StoriesViewComponent: React.FC<StoriesComponentProps> = ({
   const location = useLocation();
   const dispatch = useDispatch();
   const audioPlayerRef = useRef<AudioPlayerHandle>(null);
-  const readerPreferences = useReaderPreferences();
 
   // Error handling states
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -446,7 +443,6 @@ const StoriesViewComponent: React.FC<StoriesComponentProps> = ({
       <div className="max-w-4xl mx-auto space-y-6">
         {selectedStory ? (
           <div className="bg-slate-800 border border-slate-700/50 p-6 rounded-2xl shadow-xl">
-
             <h2 className="text-2xl font-black mb-4">{selectedStory.title}</h2>
             
             <div className="flex flex-col md:flex-row gap-6 mb-6">
