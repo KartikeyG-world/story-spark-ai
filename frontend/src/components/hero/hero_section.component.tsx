@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
+import type { ReactNode } from "react";
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
@@ -64,12 +66,14 @@ const features = [
   }
 ];
 
+type Feature = {
 interface Feature {
   title: string;
   description: string;
   bgClass: string;
   icon: ReactNode;
   path: string;
+};
 }
 
 const FeatureCard = ({ feature }: { feature: Feature }) => {
@@ -328,7 +332,7 @@ const HeroSectionComponent = () => {
                 ]}
               />
             </span>
-          </motion.h1>
+          </h1>
 
           <p className="max-w-2xl mx-auto text-sm sm:text-lg lg:text-xl text-slate-600 dark:text-slate-400 leading-relaxed mb-8 sm:mb-10 font-medium">
             Create, edit, and generate engaging multiple story variations from a single prompt.
@@ -352,6 +356,8 @@ const HeroSectionComponent = () => {
                 </Link>
               </div>
             </div>
+          </div>
+        </div>
           </motion.div>
 
         <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden select-none">
@@ -373,6 +379,8 @@ const HeroSectionComponent = () => {
             <FeatureCard feature={feature} key={index} />
           ))}
         </div>
+      </div>
+    </div>
       </motion.div>
     </motion.div>
   );
