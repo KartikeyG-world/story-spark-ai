@@ -1,6 +1,7 @@
 import StoryInspirationWrapper from "./components/StoryInspirationWrapper";
 import { JSX, useEffect, useState } from "react";
 import WritingAssistantComponent from "./components/writing-assistant/writing_assistant.component";
+import StoryConsistencyGuardian from "./components/story-consistency/StoryConsistencyGuardian";
 import {
   BrowserRouter as Router,
   Routes,
@@ -116,6 +117,14 @@ function App() {
           element={
             <RootLayout>
               <WritingAssistantComponent />
+            </RootLayout>
+          }
+        />
+        <Route
+          path="/story-consistency"
+          element={
+            <RootLayout>
+              <StoryConsistencyGuardian />
             </RootLayout>
           }
         />

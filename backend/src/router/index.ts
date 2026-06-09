@@ -19,6 +19,8 @@ import { NewsletterRouter } from "../app/modules/newsletter/newsletter.route";
 
 import { BookmarkRouter } from "../app/modules/bookmark/bookmark.router";
 
+import { StoryConsistencyRouter } from "../app/modules/story_consistency/story_consistency.router";
+
 const router = express.Router();
 
 const modules = [
@@ -69,6 +71,11 @@ const modules = [
   {
     path: "/bookmarks",
     router: BookmarkRouter,
+  },
+
+  {
+    path: "/story-consistency",
+    router: StoryConsistencyRouter,
   },
 ];
 modules.forEach((route) => router.use(route.path, route.router));

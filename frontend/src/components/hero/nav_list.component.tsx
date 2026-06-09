@@ -103,7 +103,18 @@ const NavListComponent: React.FC = () => {
                 </>
               )}
             </NavLink>
-            <NavLink to="/contact-us" className={({ isActive }) => getLinkClass(isActive)}>
+            <NavLink to="/story-consistency" className={({ isActive }) => getLinkClass(isActive)}>
+              {({ isActive }) => (
+                <>
+                  {isActive && (
+                    <span className="w-1.5 h-1.5 bg-custom rounded-full mr-1.5 animate-pulse shadow-[0_0_8px_#3b82f6]" />
+                  )}
+                  CONSISTENCY
+                </>
+              )}
+            </NavLink>
+            <NavLink
+              to="/contact-us" className={({ isActive }) => getLinkClass(isActive)}>
               {({ isActive }) => (
                 <>
                   {isActive && (
