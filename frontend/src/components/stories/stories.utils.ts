@@ -92,11 +92,17 @@ export const TOPICS: ITopicData[] = [
 
 export const topicsData: ITopicData[] = TOPICS;
 
-export const getWordCount = (str: string) => {
-  if (typeof str !== "string" || !str.trim()) {
+export const getWordCount = (str: string): number => {
+  if (typeof str !== "string") {
     return 0;
   }
-  return str.trim().split(/\s+/).length;
+
+  const normalizedText = str.replace(/[\r\n]+/g, " ").trim();
+  if (!normalizedText) {
+    return 0;
+  }
+
+  return normalizedText.split(/\s+/).filter(Boolean).length;
 };
 
 export const prompts = [
