@@ -130,7 +130,6 @@ export type SupportLink = Support_Links;
 export interface HelpSection {
   id: string;
   label: string;
-  icon?: string;
 }
 
 export const HELP_SECTIONS: HelpSection[] = [

@@ -5,9 +5,9 @@ import { User } from "../../../models/user";
 interface ProfileSettingComponentProps {
   user: User;
   onSave: (updatedUser: Partial<User>) => void;
-  onDeleteAccount?: () => void;
+  onDeleteAccount: () => void;
   loading: boolean;
-  deleting?: boolean;
+  deleting: boolean;
 }
 
 export const ProfileSettingComponent = ({

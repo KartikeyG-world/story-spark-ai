@@ -10,26 +10,33 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
+      - name: Skip Gemini review when secret is unavailable
+        if: env.GEMINI_API_KEY == ''
+        run: echo "GEMINI_API_KEY is unavailable for this pull request; skipping Gemini review."
+
       - name: Run Gemini PR Reviewer & Apply Auto-fixes
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: env.GEMINI_API_KEY != ''
         run: |
           python .github/scripts/gemini_pr_review.py
 
       - name: Commit and push auto-fixes
+        if: env.GEMINI_API_KEY != '' && github.event.pull_request.head.repo.full_name == github.repository
         run: |
           git config --global user.name "Sonu Sharma"
           git config --global user.email "sonusharma6-dsa@users.noreply.github.com"
