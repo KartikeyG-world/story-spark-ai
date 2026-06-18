@@ -206,7 +206,7 @@ const buildSentenceSegments = (content: string): StorySentenceSegment[] => {
   return segments;
 };
 
-const getSafeFileName = (title: string, extension: "md" | "docx" | "pdf"): string => {
+const getSafeFileName = (title: string, extension: "md" | "docx" | "pdf" | "txt"): string => {
   const safeTitle = (title || "story")
     .trim()
     .replace(/[^a-z0-9]+/gi, "_")
@@ -1035,6 +1035,45 @@ const StoriesViewComponent: React.FC<StoriesComponentProps> = ({
       toast.error("Failed to export Markdown.");
     }
   };
+const handleExportTXT = () => {
+  if (!selectedStory) {
+    toast.error("No story available to export.");
+    return;
+  }
+
+  if (!selectedStory.content?.trim()) {
+    toast.error("Story content is empty. Cannot export.");
+    return;
+  }
+
+  try {
+    const title = selectedStory.title || "Story";
+    const content = selectedStory.content || "";
+
+    const txtContent = `${title}\n\n${content}`;
+
+    const blob = new Blob([txtContent], {
+      type: "text/plain;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.setAttribute("download", getSafeFileName(title, "txt"));
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+
+    toast.success("TXT downloaded!");
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to export TXT.");
+  }
+};
 
   const handleExportDOCX = async () => {
     if (!selectedStory) {
@@ -1430,6 +1469,12 @@ const StoriesViewComponent: React.FC<StoriesComponentProps> = ({
                       </button>
                       <button onClick={() => handleExport("epub")} className="w-full text-left px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg flex items-center gap-2 cursor-pointer">
                         <span>📘</span> Kindle EPUB
+                      </button>
+                      <button
+                        onClick={handleExportTXT}
+                        className="w-full text-left px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg flex items-center gap-2 cursor-pointer"
+                      >
+                        <span>📄</span> TXT
                       </button>
                       <button onClick={handleExportMarkdown} className="w-full text-left px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg flex items-center gap-2 cursor-pointer">
                         <span>⬇️</span> Markdown
