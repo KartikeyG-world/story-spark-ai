@@ -65,6 +65,14 @@ const updateUser = z.object({
         .partial()
         .strict()
         .optional(),
+      writingGoals: z
+        .object({
+          dailyWordCount: z.number().min(0).optional(),
+          weeklyWordCount: z.number().min(0).optional(),
+        })
+        .partial()
+        .strict()
+        .optional(),
     })
     .partial()
     .strict(),
